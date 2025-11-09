@@ -2,7 +2,7 @@
 
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '/services/auth_gate.dart'; // Ganti import ke auth_gate.dart
+import './auth_gate_screen.dart'; // Ganti import ke auth_gate.dart
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -16,10 +16,9 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     Timer(const Duration(seconds: 3), () {
+      // Arahkan ke AuthGateScreen baru kita
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (_) => const AuthGate(),
-        ), // Arahkan ke AuthGate
+        MaterialPageRoute(builder: (_) => const AuthGateScreen()),
       );
     });
   }

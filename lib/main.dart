@@ -2,13 +2,21 @@
 
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // Impor Riverpod
 import 'firebase_options.dart';
-import 'screens/splash_screen.dart'; // Ganti import ke splash_screen.dart
+import 'presentation/screens/auth/splash_screen.dart'; // Path baru ke Splash Screen
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(const MyApp());
+  
+  runApp(
+    // Bungkus seluruh aplikasi dengan ProviderScope
+    // Ini agar state Riverpod bisa diakses di mana saja
+    const ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -17,10 +25,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Health App',
-      theme: ThemeData(primarySwatch: Colors.teal),
+      title: 'e-Penilaian Santri',
+      theme: ThemeData(
+        primarySwatch: Colors.teal,
+        scaffoldBackgroundColor: Colors.grey[50],
+      ),
       debugShowCheckedModeBanner: false,
-      home: const SplashScreen(), // Ganti home menjadi SplashScreen()
+      home: const SplashScreen(), // Mulai dari Splash Screen (di lokasi baru)
     );
   }
 }
