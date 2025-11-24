@@ -29,7 +29,7 @@ class HomeScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Text(
-              'Selamat Datang!',
+              'Selamat Datanggg!',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             Text(
@@ -49,13 +49,16 @@ class HomeScreen extends StatelessWidget {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.teal,
-                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 30,
+                  vertical: 15,
+                ),
               ),
               child: const Text(
                 'Kelola Data Santri',
                 style: TextStyle(fontSize: 16),
               ),
-            )
+            ),
           ],
         ),
       ),
