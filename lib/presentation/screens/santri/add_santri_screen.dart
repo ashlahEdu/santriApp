@@ -2,8 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '/domain/entities/santri.dart';
-import '/presentation/providers/user_providers.dart';
+import '../../../domain/entities/santri.dart'; // Sesuaikan path import jika perlu
+import '../../providers/user_providers.dart';  // Sesuaikan path import jika perlu
 
 class AddSantriScreen extends ConsumerStatefulWidget {
   const AddSantriScreen({super.key});
@@ -33,9 +33,7 @@ class _AddSantriScreenState extends ConsumerState<AddSantriScreen> {
   Future<void> _saveSantri() async {
     if (!_formKey.currentState!.validate()) return;
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() { _isLoading = true; });
 
     try {
       final newSantri = Santri(
@@ -50,10 +48,7 @@ class _AddSantriScreenState extends ConsumerState<AddSantriScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Santri berhasil ditambahkan'),
-            backgroundColor: Colors.green,
-          ),
+          const SnackBar(content: Text('Santri berhasil ditambahkan'), backgroundColor: Colors.green),
         );
         Navigator.of(context).pop();
       }
@@ -64,25 +59,23 @@ class _AddSantriScreenState extends ConsumerState<AddSantriScreen> {
         );
       }
     } finally {
-      if (mounted)
-        setState(() {
-          _isLoading = false;
-        });
+      if (mounted) setState(() { _isLoading = false; });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA), // Background Abu-abu Modern
+      backgroundColor: const Color(0xFFF5F7FA), // Background modern
       appBar: AppBar(
-        title: const Text(
-          'Tambah Santri',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.teal, // AppBar Teal (Konsisten)
+        title: const Text('Tambah Santri', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.teal,
         elevation: 0,
         centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -91,21 +84,20 @@ class _AddSantriScreenState extends ConsumerState<AddSantriScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Header Teks Kecil
               Padding(
                 padding: const EdgeInsets.only(left: 4, bottom: 12),
                 child: Text(
                   "INFORMASI DASAR",
                   style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 13, 
+                    fontWeight: FontWeight.bold, 
                     color: Colors.grey[600],
-                    letterSpacing: 1.2,
+                    letterSpacing: 1.2
                   ),
                 ),
               ),
-
-              // Container Form Putih
+              
+              // Container Putih (Card Effect)
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
@@ -160,7 +152,7 @@ class _AddSantriScreenState extends ConsumerState<AddSantriScreen> {
 
               const SizedBox(height: 32),
 
-              // Tombol Simpan
+              // Tombol Simpan Besar
               SizedBox(
                 height: 55,
                 child: ElevatedButton(
@@ -178,11 +170,7 @@ class _AddSantriScreenState extends ConsumerState<AddSantriScreen> {
                       ? const CircularProgressIndicator(color: Colors.white)
                       : const Text(
                           'SIMPAN DATA',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1,
-                          ),
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1),
                         ),
                 ),
               ),
@@ -193,7 +181,7 @@ class _AddSantriScreenState extends ConsumerState<AddSantriScreen> {
     );
   }
 
-  // Helper Widget untuk Input Field
+  // Widget Helper untuk Input Field Modern
   Widget _buildModernField({
     required TextEditingController controller,
     required String label,
@@ -203,15 +191,13 @@ class _AddSantriScreenState extends ConsumerState<AddSantriScreen> {
     return TextFormField(
       controller: controller,
       keyboardType: isNumber ? TextInputType.number : TextInputType.text,
-      style: const TextStyle(fontWeight: FontWeight.w500),
+      style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF2D3436)),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: TextStyle(color: Colors.grey[600]),
+        labelStyle: TextStyle(color: Colors.grey[500], fontWeight: FontWeight.w500),
         prefixIcon: Icon(icon, color: Colors.teal.shade300),
         filled: true,
-        fillColor: const Color(
-          0xFFF9FAFB,
-        ), // Sedikit lebih terang dari background utama
+        fillColor: const Color(0xFFF9FAFB), // Warna isi input abu-abu sangat muda
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: Colors.grey.shade200),
@@ -220,10 +206,7 @@ class _AddSantriScreenState extends ConsumerState<AddSantriScreen> {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: Colors.teal, width: 2),
         ),
-        contentPadding: const EdgeInsets.symmetric(
-          vertical: 16,
-          horizontal: 20,
-        ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
       ),
       validator: (value) {
         if (value == null || value.isEmpty) return '$label tidak boleh kosong';

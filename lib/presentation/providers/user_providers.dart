@@ -7,6 +7,8 @@ import '../../data/repositories/user_repository_impl.dart';
 import '../../domain/entities/santri.dart'; // Impor entitas Santri
 import '../../domain/repositories/santri_repository.dart'; // Impor kontrak Santri
 import '../../domain/repositories/user_repository.dart';
+import '/data/repositories/penilaian_repository_impl.dart';
+import '/domain/entities/penilaian_tahfidz.dart';
 
 // 1. Provider untuk instance FirebaseFirestore (Sudah ada)
 final firebaseFirestoreProvider = Provider<FirebaseFirestore>((ref) {
@@ -17,7 +19,6 @@ final firebaseFirestoreProvider = Provider<FirebaseFirestore>((ref) {
 final userRepositoryProvider = Provider<UserRepository>((ref) {
   return UserRepositoryImpl(ref.watch(firebaseFirestoreProvider));
 });
-
 
 // --- TAMBAHKAN KODE BARU DI BAWAH INI ---
 
@@ -30,3 +31,15 @@ final santriRepositoryProvider = Provider<SantriRepository>((ref) {
 final allSantriStreamProvider = StreamProvider<List<Santri>>((ref) {
   return ref.watch(santriRepositoryProvider).getAllSantri();
 });
+
+// Provider Repository
+final penilaianRepositoryProvider = Provider<PenilaianRepository>((ref) {
+  return PenilaianRepositoryImpl(ref.watch(firebaseFirestoreProvider));
+});
+
+// Stream Provider untuk mengambil history tahfidz (butuh ID Santri)
+// Kita gunakan .family karena butuh parameter santriId
+final tahfidzHistoryProvider =
+    StreamProvider.family<List<PenilaianTahfidz>, String>((ref, santriId) {
+      return ref.watch(penilaianRepositoryProvider).getTahfidzHistory(santriId);
+    });

@@ -6,6 +6,8 @@ import '../../../domain/entities/santri.dart';
 import '../../providers/user_providers.dart';
 import 'add_santri_screen.dart';
 import 'edit_santri_screen.dart';
+import 'santri_detail_screen.dart';
+import 'santri_detail_screen.dart';
 
 class SantriListScreen extends ConsumerWidget {
   const SantriListScreen({super.key});
@@ -129,7 +131,7 @@ class SantriListScreen extends ConsumerWidget {
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => EditSantriScreen(santri: santri),
+                builder: (context) => SantriDetailScreen(santri: santri),
               ),
             );
           },

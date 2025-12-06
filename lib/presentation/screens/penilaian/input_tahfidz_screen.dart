@@ -1,65 +1,59 @@
-// Lokasi: lib/presentation/screens/santri/edit_santri_screen.dart
+// Lokasi: lib/presentation/screens/penilaian/input_tahfidz_screen.dart
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../domain/entities/santri.dart'; // Sesuaikan path import
-import '../../providers/user_providers.dart'; // Sesuaikan path import
+import '../../../domain/entities/penilaian_tahfidz.dart';
+import '../../../domain/entities/santri.dart';
+import '../../providers/user_providers.dart';
 
-class EditSantriScreen extends ConsumerStatefulWidget {
+class InputTahfidzScreen extends ConsumerStatefulWidget {
   final Santri santri;
-  const EditSantriScreen({super.key, required this.santri});
+  const InputTahfidzScreen({super.key, required this.santri});
 
   @override
-  ConsumerState<EditSantriScreen> createState() => _EditSantriScreenState();
+  ConsumerState<InputTahfidzScreen> createState() => _InputTahfidzScreenState();
 }
 
-class _EditSantriScreenState extends ConsumerState<EditSantriScreen> {
-  final _namaController = TextEditingController();
-  final _nisController = TextEditingController();
-  final _kamarController = TextEditingController();
-  final _angkatanController = TextEditingController();
+class _InputTahfidzScreenState extends ConsumerState<InputTahfidzScreen> {
+  final _surahController = TextEditingController();
+  final _ayatController = TextEditingController();
+  final _tajwidController = TextEditingController();
+  DateTime _selectedDate = DateTime.now();
+
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
 
   @override
-  void initState() {
-    super.initState();
-    _namaController.text = widget.santri.nama;
-    _nisController.text = widget.santri.nis;
-    _kamarController.text = widget.santri.kamar;
-    _angkatanController.text = widget.santri.angkatan.toString();
-  }
-
-  @override
   void dispose() {
-    _namaController.dispose();
-    _nisController.dispose();
-    _kamarController.dispose();
-    _angkatanController.dispose();
+    _surahController.dispose();
+    _ayatController.dispose();
+    _tajwidController.dispose();
     super.dispose();
   }
 
-  Future<void> _updateSantri() async {
+  Future<void> _saveNilai() async {
     if (!_formKey.currentState!.validate()) return;
+
     setState(() {
       _isLoading = true;
     });
 
     try {
-      final updatedSantri = Santri(
-        id: widget.santri.id,
-        nama: _namaController.text,
-        nis: _nisController.text,
-        kamar: _kamarController.text,
-        angkatan: int.parse(_angkatanController.text),
+      final penilaian = PenilaianTahfidz(
+        id: '',
+        santriId: widget.santri.id,
+        surah: _surahController.text,
+        ayat: int.parse(_ayatController.text),
+        nilaiTajwid: int.parse(_tajwidController.text),
+        tanggal: _selectedDate,
       );
 
-      await ref.read(santriRepositoryProvider).updateSantri(updatedSantri);
+      await ref.read(penilaianRepositoryProvider).addTahfidz(penilaian);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Data berhasil diperbarui'),
+            content: Text('Nilai Tahfidz berhasil disimpan'),
             backgroundColor: Colors.green,
           ),
         );
@@ -79,49 +73,25 @@ class _EditSantriScreenState extends ConsumerState<EditSantriScreen> {
     }
   }
 
-  Future<void> _deleteSantri() async {
-    final bool? shouldDelete = await showDialog<bool>(
+  Future<void> _pickDate() async {
+    final picked = await showDatePicker(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          'Hapus Santri',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        content: Text('Yakin ingin menghapus data ${widget.santri.nama}?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Batal', style: TextStyle(color: Colors.grey)),
+      initialDate: _selectedDate,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(primary: Colors.teal),
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red.shade50,
-              foregroundColor: Colors.red,
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: const Text('Hapus'),
-          ),
-        ],
-      ),
+          child: child!,
+        );
+      },
     );
-
-    if (shouldDelete == true) {
+    if (picked != null) {
       setState(() {
-        _isLoading = true;
+        _selectedDate = picked;
       });
-      try {
-        await ref.read(santriRepositoryProvider).deleteSantri(widget.santri.id);
-        if (mounted) {
-          Navigator.of(context).pop();
-        }
-      } catch (e) {
-        // Handle error
-      }
     }
   }
 
@@ -131,7 +101,7 @@ class _EditSantriScreenState extends ConsumerState<EditSantriScreen> {
       backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
         title: const Text(
-          'Edit Santri',
+          'Input Tahfidz',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.teal,
@@ -141,12 +111,6 @@ class _EditSantriScreenState extends ConsumerState<EditSantriScreen> {
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.delete_outline_rounded, color: Colors.white),
-            onPressed: _isLoading ? null : _deleteSantri,
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -155,20 +119,41 @@ class _EditSantriScreenState extends ConsumerState<EditSantriScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 4, bottom: 12),
-                child: Text(
-                  "EDIT INFORMASI",
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey[600],
-                    letterSpacing: 1.2,
+              Row(
+                children: [
+                  CircleAvatar(
+                    backgroundColor: Colors.teal.shade100,
+                    child: Text(
+                      widget.santri.nama.isNotEmpty
+                          ? widget.santri.nama[0]
+                          : '?',
+                      style: const TextStyle(
+                        color: Colors.teal,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.santri.nama,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Text(
+                        "Input hafalan baru",
+                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ],
               ),
+              const SizedBox(height: 24),
 
-              // Container Form Putih
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
@@ -184,34 +169,65 @@ class _EditSantriScreenState extends ConsumerState<EditSantriScreen> {
                 ),
                 child: Column(
                   children: [
-                    _buildModernField(
-                      controller: _namaController,
-                      label: 'Nama Lengkap',
-                      icon: Icons.person_outline,
+                    // TANGGAL (VERSI AMAN)
+                    InkWell(
+                      onTap: _pickDate,
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: 20,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF9FAFB),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey.shade200),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.calendar_today,
+                              color: Colors.teal,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 12),
+                            // --- BAGIAN YANG DIPERBAIKI ---
+                            Text(
+                              "${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF2D3436),
+                              ),
+                            ),
+                            // ------------------------------
+                          ],
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 20),
+
                     _buildModernField(
-                      controller: _nisController,
-                      label: 'Nomor Induk (NIS)',
-                      icon: Icons.badge_outlined,
-                      isNumber: true,
+                      controller: _surahController,
+                      label: 'Nama Surah',
+                      icon: Icons.menu_book_rounded,
                     ),
                     const SizedBox(height: 20),
                     Row(
                       children: [
                         Expanded(
                           child: _buildModernField(
-                            controller: _kamarController,
-                            label: 'Kamar',
-                            icon: Icons.bed_outlined,
+                            controller: _ayatController,
+                            label: 'Ayat Terakhir',
+                            icon: Icons.format_list_numbered_rounded,
+                            isNumber: true,
                           ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
                           child: _buildModernField(
-                            controller: _angkatanController,
-                            label: 'Angkatan',
-                            icon: Icons.calendar_today_outlined,
+                            controller: _tajwidController,
+                            label: 'Nilai Tajwid',
+                            icon: Icons.star_outline_rounded,
                             isNumber: true,
                           ),
                         ),
@@ -223,11 +239,10 @@ class _EditSantriScreenState extends ConsumerState<EditSantriScreen> {
 
               const SizedBox(height: 32),
 
-              // Tombol Update
               SizedBox(
                 height: 55,
                 child: ElevatedButton(
-                  onPressed: _isLoading ? null : _updateSantri,
+                  onPressed: _isLoading ? null : _saveNilai,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.teal,
                     foregroundColor: Colors.white,
@@ -240,7 +255,7 @@ class _EditSantriScreenState extends ConsumerState<EditSantriScreen> {
                   child: _isLoading
                       ? const CircularProgressIndicator(color: Colors.white)
                       : const Text(
-                          'PERBARUI DATA',
+                          'SIMPAN PENILAIAN',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -292,7 +307,7 @@ class _EditSantriScreenState extends ConsumerState<EditSantriScreen> {
         ),
       ),
       validator: (value) {
-        if (value == null || value.isEmpty) return '$label tidak boleh kosong';
+        if (value == null || value.isEmpty) return '$label wajib diisi';
         if (isNumber && int.tryParse(value) == null) return 'Harus angka';
         return null;
       },
