@@ -10,6 +10,8 @@ import '../penilaian/input_tahfidz_screen.dart';
 import '../penilaian/input_mapel_screen.dart';
 import '../penilaian/input_akhlak_screen.dart';
 import '../penilaian/input_kehadiran_screen.dart';
+import '../rapor/rapor_tab.dart';
+import '../rapor/rapor_tab.dart';
 
 class SantriDetailScreen extends ConsumerStatefulWidget {
   final Santri santri;
@@ -151,9 +153,11 @@ class _SantriDetailScreenState extends ConsumerState<SantriDetailScreen>
         body: TabBarView(
           controller: _tabController,
           children: [
-            _buildHistoryTab(), // Tab 1: Menampilkan Riwayat Tahfidz
-            _buildInputTab(), // Tab 2: Menu Input
-            const Center(child: Text("Fitur Rapor akan segera hadir")), // Tab 3
+            _buildHistoryTab(), // Tab 1
+            _buildInputTab(), // Tab 2
+            // --- TAB 3: RAPOR ---
+            RaporTab(santri: widget.santri),
+            // --------------------
           ],
         ),
       ),

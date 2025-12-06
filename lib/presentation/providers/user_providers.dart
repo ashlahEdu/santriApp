@@ -10,6 +10,10 @@ import '../../domain/repositories/user_repository.dart';
 import '/data/repositories/penilaian_repository_impl.dart';
 import '/domain/entities/penilaian_tahfidz.dart';
 
+import '../../domain/entities/penilaian_mapel.dart';
+import '../../domain/entities/penilaian_akhlak.dart';
+import '../../domain/entities/kehadiran.dart';
+
 // 1. Provider untuk instance FirebaseFirestore (Sudah ada)
 final firebaseFirestoreProvider = Provider<FirebaseFirestore>((ref) {
   return FirebaseFirestore.instance;
@@ -43,3 +47,23 @@ final tahfidzHistoryProvider =
     StreamProvider.family<List<PenilaianTahfidz>, String>((ref, santriId) {
       return ref.watch(penilaianRepositoryProvider).getTahfidzHistory(santriId);
     });
+
+final mapelHistoryProvider =
+    StreamProvider.family<List<PenilaianMapel>, String>((ref, santriId) {
+      return ref
+          .watch(penilaianRepositoryProvider)
+          .getMapelHistory(santriId, '');
+    });
+
+// 4. Provider Riwayat Akhlak
+final akhlakHistoryProvider =
+    StreamProvider.family<List<PenilaianAkhlak>, String>((ref, santriId) {
+      return ref.watch(penilaianRepositoryProvider).getAkhlakHistory(santriId);
+    });
+
+// 5. Provider Riwayat Kehadiran
+final kehadiranHistoryProvider = StreamProvider.family<List<Kehadiran>, String>(
+  (ref, santriId) {
+    return ref.watch(penilaianRepositoryProvider).getKehadiranHistory(santriId);
+  },
+);

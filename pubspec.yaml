@@ -40,6 +40,8 @@ dependencies:
   cloud_firestore: ^6.0.2
   flutter_riverpod: ^3.0.3
   riverpod_annotation: ^3.0.3
+  pdf: ^3.11.3
+  printing: ^5.14.2
 
 dev_dependencies:
   flutter_test:
