@@ -33,10 +33,7 @@ class DefaultFirebaseOptions {
           'you can reconfigure this by running the FlutterFire CLI again.',
         );
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -65,4 +62,14 @@ class DefaultFirebaseOptions {
     storageBucket: 'auth-app-flutter-8411d.firebasestorage.app',
     iosBundleId: 'com.example.authApp',
   );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyDC2lrLzzFjHzAvy9ExSRot6o78nE3V-uA',
+    appId: '1:229249416159:web:7e97a6c083c97edf7ee26a',
+    messagingSenderId: '229249416159',
+    projectId: 'auth-app-flutter-8411d',
+    authDomain: 'auth-app-flutter-8411d.firebaseapp.com',
+    storageBucket: 'auth-app-flutter-8411d.firebasestorage.app',
+  );
+
 }
