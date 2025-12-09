@@ -39,6 +39,8 @@ class _SantriDetailScreenState extends ConsumerState<SantriDetailScreen>
 
   @override
   Widget build(BuildContext context) {
+    final canEdit = ref.watch(canEditProvider); // Cek apakah user bisa edit
+    
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
       body: NestedScrollView(
@@ -55,17 +57,19 @@ class _SantriDetailScreenState extends ConsumerState<SantriDetailScreen>
                 onPressed: () => Navigator.of(context).pop(),
               ),
               actions: [
-                IconButton(
-                  icon: const Icon(Icons.edit_outlined, color: Colors.white),
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            EditSantriScreen(santri: widget.santri),
-                      ),
-                    );
-                  },
-                ),
+                // Tombol Edit - hanya tampil jika user bisa edit (admin/ustadz)
+                if (canEdit)
+                  IconButton(
+                    icon: const Icon(Icons.edit_outlined, color: Colors.white),
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              EditSantriScreen(santri: widget.santri),
+                        ),
+                      );
+                    },
+                  ),
               ],
               flexibleSpace: FlexibleSpaceBar(
                 background: Container(
@@ -154,7 +158,7 @@ class _SantriDetailScreenState extends ConsumerState<SantriDetailScreen>
           controller: _tabController,
           children: [
             _buildHistoryTab(), // Tab 1
-            _buildInputTab(), // Tab 2
+            _buildInputTab(canEdit), // Tab 2 - pass canEdit parameter
             // --- TAB 3: RAPOR ---
             RaporTab(santri: widget.santri),
             // --------------------
@@ -310,7 +314,56 @@ class _SantriDetailScreenState extends ConsumerState<SantriDetailScreen>
   }
 
   // --- TAB 2: INPUT MENU ---
-  Widget _buildInputTab() {
+  Widget _buildInputTab(bool canEdit) {
+    // Jika user tidak bisa edit (wali-santri), tampilkan pesan
+    if (!canEdit) {
+      return Center(
+        child: Container(
+          margin: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(32),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.1),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.lock_outline_rounded,
+                size: 64,
+                color: Colors.grey.shade400,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                "Akses Terbatas",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey.shade700,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                "Anda login sebagai Wali Santri.\nFitur input nilai hanya tersedia untuk Admin dan Ustadz/Wali.",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [

@@ -1,25 +1,36 @@
 // Lokasi: lib/presentation/screens/main/home_screen.dart
 
+import 'package:auth_app/domain/entities/user_role.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../providers/user_providers.dart';
 import '../santri/santri_list_screen.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _selectedIndex = 0; // Index untuk Bottom Navigation Bar
 
   @override
   Widget build(BuildContext context) {
     // Mengambil data user untuk ditampilkan
     final user = FirebaseAuth.instance.currentUser;
+    // Mengambil data user dari provider (termasuk role)
+    final currentUserAsync = ref.watch(currentUserProvider);
     // Mengambil nama depan dari email (contoh: ahmad@gmail.com -> Ahmad)
-    final String userName = user?.email?.split('@')[0].toUpperCase() ?? 'ADMIN';
+    final String userName = user?.email?.split('@')[0].toUpperCase() ?? 'USER';
+    // Mengambil role display name
+    final String roleDisplayName = currentUserAsync.when(
+      data: (appUser) => appUser?.role.displayName ?? 'Loading...',
+      loading: () => 'Loading...',
+      error: (_, __) => 'Error',
+    );
 
     return Scaffold(
       backgroundColor: const Color(
@@ -71,6 +82,26 @@ class _HomeScreenState extends State<HomeScreen> {
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 1,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          // Menampilkan Role Badge
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              roleDisplayName,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
                         ],

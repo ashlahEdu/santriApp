@@ -15,6 +15,7 @@ class SantriListScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final santriListAsync = ref.watch(allSantriStreamProvider);
+    final canEdit = ref.watch(canEditProvider); // Cek apakah user bisa edit
 
     return Scaffold(
       // Latar belakang sedikit off-white agar kartu lebih menonjol (seperti MyXL)
@@ -28,20 +29,21 @@ class SantriListScreen extends ConsumerWidget {
         ),
         centerTitle: true,
         actions: [
-          // Tombol Tambah yang lebih modern (teks + ikon)
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: IconButton(
-              icon: const Icon(Icons.add_circle_outline, size: 28),
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const AddSantriScreen(),
-                  ),
-                );
-              },
+          // Tombol Tambah - hanya tampil jika user bisa edit (admin/ustadz)
+          if (canEdit)
+            Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: IconButton(
+                icon: const Icon(Icons.add_circle_outline, size: 28),
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const AddSantriScreen(),
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
         ],
         // Menambahkan bagian bawah AppBar melengkung (opsional, menambah kesan modern)
         shape: const RoundedRectangleBorder(
@@ -72,25 +74,27 @@ class SantriListScreen extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const AddSantriScreen(),
+                  // Tombol tambah hanya tampil jika user bisa edit
+                  if (canEdit)
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const AddSantriScreen(),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.add),
+                      label: const Text("Tambah Sekarang"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.teal,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
                         ),
-                      );
-                    },
-                    icon: const Icon(Icons.add),
-                    label: const Text("Tambah Sekarang"),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.teal,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                  ),
                 ],
               ),
             );
@@ -102,7 +106,7 @@ class SantriListScreen extends ConsumerWidget {
             separatorBuilder: (context, index) => const SizedBox(height: 16),
             itemBuilder: (context, index) {
               final santri = santriList[index];
-              return _buildModernCard(context, santri);
+              return _buildModernCard(context, santri, canEdit);
             },
           );
         },
@@ -110,7 +114,7 @@ class SantriListScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildModernCard(BuildContext context, Santri santri) {
+  Widget _buildModernCard(BuildContext context, Santri santri, bool canEdit) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -217,12 +221,19 @@ class SantriListScreen extends ConsumerWidget {
                       ),
                     ),
 
-                    // 3. Tombol Edit Mini
-                    Icon(
-                      Icons.edit_rounded,
-                      color: Colors.grey.shade300,
-                      size: 20,
-                    ),
+                    // 3. Tombol Edit Mini (hanya tampil jika bisa edit)
+                    if (canEdit)
+                      Icon(
+                        Icons.edit_rounded,
+                        color: Colors.grey.shade300,
+                        size: 20,
+                      )
+                    else
+                      Icon(
+                        Icons.visibility_rounded,
+                        color: Colors.grey.shade300,
+                        size: 20,
+                      ),
                   ],
                 ),
 
