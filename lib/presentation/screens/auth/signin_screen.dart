@@ -195,21 +195,40 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                     // Social Login (Placeholder)
                     // ...
                     const SizedBox(height: 20),
-                    // Link ke Sign Up
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text("Don't have an account? "),
-                        GestureDetector(
-                          // 7. Gunakan fungsi onTap dari widget
-                          onTap: widget.onTap,
-                          child: const Text('Sign Up',
-                              style: TextStyle(
-                                  color: Colors.teal,
-                                  fontWeight: FontWeight.bold)),
+                    // Link ke Sign Up (only if enabled)
+                    if (widget.onTap != null)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text("Don't have an account? "),
+                          GestureDetector(
+                            onTap: widget.onTap,
+                            child: const Text('Sign Up',
+                                style: TextStyle(
+                                    color: Colors.teal,
+                                    fontWeight: FontWeight.bold)),
+                          ),
+                        ],
+                      )
+                    else
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                      ],
-                    ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.info_outline, color: Colors.grey.shade600, size: 18),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Hubungi Admin untuk membuat akun',
+                              style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                            ),
+                          ],
+                        ),
+                      ),
                   ],
                 ),
               ),

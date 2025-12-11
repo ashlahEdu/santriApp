@@ -6,6 +6,7 @@ import '../../data/repositories/santri_repository_impl.dart';
 import '../../data/repositories/user_repository_impl.dart';
 import '../../domain/entities/app_user.dart';
 import '../../domain/entities/santri.dart'; // Impor entitas Santri
+import '../../domain/entities/user_role.dart';
 import '../../domain/repositories/santri_repository.dart'; // Impor kontrak Santri
 import '../../domain/repositories/user_repository.dart';
 import '/data/repositories/penilaian_repository_impl.dart';
@@ -33,9 +34,28 @@ final santriRepositoryProvider = Provider<SantriRepository>((ref) {
   return SantriRepositoryImpl(ref.watch(firebaseFirestoreProvider));
 });
 
-// 4. StreamProvider untuk mendapatkan SEMUA santri secara real-time
+// 4. StreamProvider untuk mendapatkan santri berdasarkan role
+// - Admin: semua santri
+// - Guru/Wali: hanya santri yang di-assign
 final allSantriStreamProvider = StreamProvider<List<Santri>>((ref) {
-  return ref.watch(santriRepositoryProvider).getAllSantri();
+  final currentUser = ref.watch(currentUserProvider).value;
+  final santriRepo = ref.watch(santriRepositoryProvider);
+  
+  if (currentUser == null) {
+    return Stream.value([]);
+  }
+  
+  // Admin dapat mengakses semua santri
+  if (currentUser.role == UserRole.admin) {
+    return santriRepo.getAllSantri();
+  }
+  
+  // Guru dan Wali hanya dapat melihat santri yang di-assign
+  if (currentUser.assignedSantriIds.isEmpty) {
+    return Stream.value([]);
+  }
+  
+  return santriRepo.getSantriByIds(currentUser.assignedSantriIds);
 });
 
 // Provider Repository
@@ -91,4 +111,9 @@ final currentUserProvider = StreamProvider<AppUser?>((ref) {
 final canEditProvider = Provider<bool>((ref) {
   final currentUser = ref.watch(currentUserProvider).value;
   return currentUser?.canEdit ?? false;
+});
+
+// 8. StreamProvider untuk Admin - mendapatkan semua user
+final allUsersStreamProvider = StreamProvider<List<AppUser>>((ref) {
+  return ref.watch(userRepositoryProvider).getAllUsers();
 });

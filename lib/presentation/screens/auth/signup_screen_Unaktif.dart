@@ -28,9 +28,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   bool _obscureConfirmPassword = true;
   bool _agreeToTerms = false;
   bool _isLoading = false;
-  
-  // State untuk role yang dipilih
-  UserRole _selectedRole = UserRole.waliSantri;
 
   // Fungsi untuk memproses pendaftaran
   Future<void> _signUp() async {
@@ -61,13 +58,14 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                 _passwordController.text.trim(),
               );
 
-      // 8. Jika daftar berhasil, panggil 'otak' User (Riverpod) dengan role
+      // 8. Jika daftar berhasil, panggil 'otak' User (Riverpod) dengan role default
+      // NOTE: File ini tidak digunakan dalam sistem admin-only
       if (userCredential.user != null) {
         await ref.read(userRepositoryProvider).saveUserData(
               userCredential.user!.uid,
               _emailController.text.trim(),
               _mobileNumberController.text.trim(),
-              _selectedRole, // Simpan role yang dipilih
+              UserRole.wali, // Default role (file ini tidak digunakan)
             );
       }
       // AuthGate akan menangani navigasi secara otomatis
@@ -167,34 +165,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                             borderRadius: BorderRadius.circular(30),
                             borderSide: const BorderSide(color: Colors.teal)),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    // Dropdown untuk memilih Role
-                    DropdownButtonFormField<UserRole>(
-                      value: _selectedRole,
-                      decoration: InputDecoration(
-                        hintText: 'Pilih Role',
-                        prefixIcon: Icon(Icons.person_outline, color: Colors.grey),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(30),
-                            borderSide: const BorderSide(color: Colors.grey)),
-                        focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(30),
-                            borderSide: const BorderSide(color: Colors.teal)),
-                      ),
-                      items: UserRole.values.map((role) {
-                        return DropdownMenuItem<UserRole>(
-                          value: role,
-                          child: Text(role.displayName),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        if (value != null) {
-                          setState(() {
-                            _selectedRole = value;
-                          });
-                        }
-                      },
                     ),
                     const SizedBox(height: 16),
                     // TextField Password

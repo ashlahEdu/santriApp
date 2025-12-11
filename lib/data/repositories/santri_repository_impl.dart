@@ -43,6 +43,50 @@ class SantriRepositoryImpl implements SantriRepository {
   }
 
   @override
+  Stream<List<Santri>> getSantriByIds(List<String> ids) {
+    if (ids.isEmpty) {
+      return Stream.value([]);
+    }
+    
+    // Firestore 'whereIn' max 30 items, jadi kita batch kalau perlu
+    // Untuk kasus sederhana, langsung query
+    if (ids.length <= 30) {
+      return _santriCollection
+          .where(FieldPath.documentId, whereIn: ids)
+          .snapshots()
+          .map((snapshot) {
+        return snapshot.docs.map((doc) {
+          return SantriModel.fromFirestore(
+            doc.data() as Map<String, dynamic>,
+            doc.id,
+          );
+        }).toList();
+      });
+    }
+    
+    // Jika lebih dari 30, kita fetch per dokumen (untuk kasus edge case)
+    // Buat stream dari masing-masing dokumen
+    final streams = ids.map((id) {
+      return _santriCollection.doc(id).snapshots().map((doc) {
+        if (doc.exists) {
+          return SantriModel.fromFirestore(
+            doc.data() as Map<String, dynamic>,
+            doc.id,
+          );
+        }
+        return null;
+      });
+    });
+    
+    // Combine semua streams
+    return Stream.value(streams).asyncMap((s) async {
+      final futures = s.map((stream) => stream.first).toList();
+      final results = await Future.wait(futures);
+      return results.whereType<Santri>().toList();
+    });
+  }
+
+  @override
   Future<Santri?> getSantriById(String id) async {
     final doc = await _santriCollection.doc(id).get();
     if (doc.exists) {

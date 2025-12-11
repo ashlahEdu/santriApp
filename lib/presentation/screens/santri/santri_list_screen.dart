@@ -3,10 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../domain/entities/santri.dart';
+import '../../../domain/entities/user_role.dart';
 import '../../providers/user_providers.dart';
 import 'add_santri_screen.dart';
-import 'edit_santri_screen.dart';
-import 'santri_detail_screen.dart';
 import 'santri_detail_screen.dart';
 
 class SantriListScreen extends ConsumerWidget {
@@ -16,6 +15,7 @@ class SantriListScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final santriListAsync = ref.watch(allSantriStreamProvider);
     final canEdit = ref.watch(canEditProvider); // Cek apakah user bisa edit
+    final currentUser = ref.watch(currentUserProvider).value;
 
     return Scaffold(
       // Latar belakang sedikit off-white agar kartu lebih menonjol (seperti MyXL)
@@ -29,8 +29,8 @@ class SantriListScreen extends ConsumerWidget {
         ),
         centerTitle: true,
         actions: [
-          // Tombol Tambah - hanya tampil jika user bisa edit (admin/ustadz)
-          if (canEdit)
+          // Tombol Tambah - hanya tampil untuk Admin
+          if (currentUser?.role.canAddSantri == true)
             Padding(
               padding: const EdgeInsets.only(right: 16.0),
               child: IconButton(
@@ -54,6 +54,9 @@ class SantriListScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => Center(child: Text('Error: $error')),
         data: (santriList) {
+          // Provider sudah handle filtering berdasarkan role
+          // Admin: semua santri, Guru/Wali: hanya yang di-assign
+          
           if (santriList.isEmpty) {
             return Center(
               child: Column(
@@ -66,16 +69,19 @@ class SantriListScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Belum ada data santri',
+                    (currentUser?.role == UserRole.wali || currentUser?.role == UserRole.guru)
+                        ? 'Belum ada santri yang di-assign ke Anda'
+                        : 'Belum ada data santri',
                     style: TextStyle(
                       color: Colors.grey.shade500,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
+                    textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),
-                  // Tombol tambah hanya tampil jika user bisa edit
-                  if (canEdit)
+                  // Tombol tambah hanya tampil untuk Admin
+                  if (currentUser?.role.canAddSantri == true)
                     ElevatedButton.icon(
                       onPressed: () {
                         Navigator.of(context).push(

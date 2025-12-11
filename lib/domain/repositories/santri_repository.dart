@@ -8,6 +8,9 @@ abstract class SantriRepository {
   // Read (mendapatkan semua santri)
   Stream<List<Santri>> getAllSantri();
 
+  // Read (mendapatkan santri berdasarkan list ID)
+  Stream<List<Santri>> getSantriByIds(List<String> ids);
+
   // Read (mendapatkan satu santri)
   Future<Santri?> getSantriById(String id);
 

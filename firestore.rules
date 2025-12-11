@@ -1,0 +1,10 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Semua user yang login bisa akses semua data
+    // Role-based restriction di-handle di Flutter app
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}

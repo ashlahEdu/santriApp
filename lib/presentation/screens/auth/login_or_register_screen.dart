@@ -1,33 +1,16 @@
 // Lokasi: lib/presentation/screens/auth/login_or_register_screen.dart
+// Sistem Admin-Only: Tidak ada signup publik, hanya login
 
 import 'package:flutter/material.dart';
 import 'signin_screen.dart';
-import 'signup_screen.dart';
 
-class LoginOrRegisterScreen extends StatefulWidget {
+class LoginOrRegisterScreen extends StatelessWidget {
   const LoginOrRegisterScreen({super.key});
 
   @override
-  State<LoginOrRegisterScreen> createState() => _LoginOrRegisterScreenState();
-}
-
-class _LoginOrRegisterScreenState extends State<LoginOrRegisterScreen> {
-  // Awalnya, tampilkan halaman login
-  bool showLoginPage = true;
-
-  // Method untuk beralih halaman
-  void togglePages() {
-    setState(() {
-      showLoginPage = !showLoginPage;
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    if (showLoginPage) {
-      return SignInScreen(onTap: togglePages);
-    } else {
-      return SignUpScreen(onTap: togglePages);
-    }
+    // Hanya tampilkan halaman login, tidak ada toggle ke signup
+    // Semua akun dibuat oleh Admin melalui dashboard
+    return const SignInScreen(onTap: null);
   }
 }

@@ -1,13 +1,13 @@
 // Lokasi: lib/domain/entities/user_role.dart
 
 /// Enum untuk mendefinisikan role pengguna dalam aplikasi.
-/// - admin: Akses penuh (CRUD semua data)
-/// - ustadzWali: Akses penuh (CRUD semua data), sama seperti admin
-/// - waliSantri: Read-only (tidak bisa menambah, edit, atau hapus data)
+/// - admin: Akses penuh (CRUD semua data + kelola user)
+/// - guru: Akses santri yang diajar (assigned)
+/// - wali: Akses santri yang diwakili (assigned) - read only
 enum UserRole {
   admin,
-  ustadzWali,
-  waliSantri,
+  guru,
+  wali,
 }
 
 /// Extension untuk menambahkan utility methods pada UserRole
@@ -17,9 +17,9 @@ extension UserRoleExtension on UserRole {
     switch (this) {
       case UserRole.admin:
         return 'Admin';
-      case UserRole.ustadzWali:
-        return 'Ustadz/Wali';
-      case UserRole.waliSantri:
+      case UserRole.guru:
+        return 'Guru';
+      case UserRole.wali:
         return 'Wali Santri';
     }
   }
@@ -29,10 +29,10 @@ extension UserRoleExtension on UserRole {
     switch (this) {
       case UserRole.admin:
         return 'admin';
-      case UserRole.ustadzWali:
-        return 'ustadz_wali';
-      case UserRole.waliSantri:
-        return 'wali_santri';
+      case UserRole.guru:
+        return 'guru';
+      case UserRole.wali:
+        return 'wali';
     }
   }
 
@@ -41,22 +41,39 @@ extension UserRoleExtension on UserRole {
     switch (value) {
       case 'admin':
         return UserRole.admin;
-      case 'ustadz_wali':
-        return UserRole.ustadzWali;
-      case 'wali_santri':
-        return UserRole.waliSantri;
+      case 'guru':
+      case 'ustadz_wali': // backward compatibility
+        return UserRole.guru;
+      case 'wali':
+      case 'wali_santri': // backward compatibility
+        return UserRole.wali;
       default:
-        return UserRole.waliSantri; // Default ke role paling rendah
+        return UserRole.wali; // Default ke role paling rendah
     }
   }
 
   /// Cek apakah role ini bisa melakukan edit (CRUD)
   bool get canEdit {
-    return this == UserRole.admin || this == UserRole.ustadzWali;
+    return this == UserRole.admin || this == UserRole.guru;
   }
 
   /// Cek apakah role ini hanya read-only
   bool get isReadOnly {
-    return this == UserRole.waliSantri;
+    return this == UserRole.wali;
+  }
+
+  /// Cek apakah role ini adalah admin
+  bool get isAdmin {
+    return this == UserRole.admin;
+  }
+
+  /// Cek apakah role ini bisa menambah santri (hanya admin)
+  bool get canAddSantri {
+    return this == UserRole.admin;
+  }
+
+  /// Cek apakah role ini bisa input nilai (admin dan guru)
+  bool get canInputNilai {
+    return this == UserRole.admin || this == UserRole.guru;
   }
 }

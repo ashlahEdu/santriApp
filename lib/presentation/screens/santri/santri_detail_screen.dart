@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '/domain/entities/santri.dart';
 import '/domain/entities/penilaian_tahfidz.dart';
+import '/domain/entities/user_role.dart';
 import '/presentation/providers/user_providers.dart';
 import '/presentation/screens/santri/edit_santri_screen.dart';
 import '../penilaian/input_tahfidz_screen.dart';
@@ -39,7 +40,9 @@ class _SantriDetailScreenState extends ConsumerState<SantriDetailScreen>
 
   @override
   Widget build(BuildContext context) {
-    final canEdit = ref.watch(canEditProvider); // Cek apakah user bisa edit
+    final currentUser = ref.watch(currentUserProvider).value;
+    final canInputNilai = currentUser?.role.canInputNilai ?? false;
+    final canEditSantri = currentUser?.role.canAddSantri ?? false; // Sama dengan canAddSantri - hanya admin
     
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
@@ -57,8 +60,8 @@ class _SantriDetailScreenState extends ConsumerState<SantriDetailScreen>
                 onPressed: () => Navigator.of(context).pop(),
               ),
               actions: [
-                // Tombol Edit - hanya tampil jika user bisa edit (admin/ustadz)
-                if (canEdit)
+                // Tombol Edit - hanya tampil untuk Admin
+                if (canEditSantri)
                   IconButton(
                     icon: const Icon(Icons.edit_outlined, color: Colors.white),
                     onPressed: () {
@@ -158,7 +161,7 @@ class _SantriDetailScreenState extends ConsumerState<SantriDetailScreen>
           controller: _tabController,
           children: [
             _buildHistoryTab(), // Tab 1
-            _buildInputTab(canEdit), // Tab 2 - pass canEdit parameter
+            _buildInputTab(canInputNilai), // Tab 2 - admin dan guru bisa input
             // --- TAB 3: RAPOR ---
             RaporTab(santri: widget.santri),
             // --------------------

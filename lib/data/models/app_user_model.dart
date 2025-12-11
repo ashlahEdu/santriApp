@@ -12,6 +12,7 @@ class AppUserModel extends AppUser {
     required super.mobileNumber,
     required super.role,
     super.createdAt,
+    super.assignedSantriIds = const [],
   });
 
   /// Factory untuk membuat AppUserModel dari dokumen Firestore
@@ -21,10 +22,13 @@ class AppUserModel extends AppUser {
       uid: data['uid'] ?? doc.id,
       email: data['email'] ?? '',
       mobileNumber: data['mobileNumber'] ?? '',
-      role: UserRoleExtension.fromFirestoreString(data['role'] ?? 'wali_santri'),
+      role: UserRoleExtension.fromFirestoreString(data['role'] ?? 'wali'),
       createdAt: data['createdAt'] != null
           ? (data['createdAt'] as Timestamp).toDate()
           : null,
+      assignedSantriIds: data['assignedSantriIds'] != null
+          ? List<String>.from(data['assignedSantriIds'])
+          : [],
     );
   }
 
@@ -34,10 +38,13 @@ class AppUserModel extends AppUser {
       uid: uid,
       email: data['email'] ?? '',
       mobileNumber: data['mobileNumber'] ?? '',
-      role: UserRoleExtension.fromFirestoreString(data['role'] ?? 'wali_santri'),
+      role: UserRoleExtension.fromFirestoreString(data['role'] ?? 'wali'),
       createdAt: data['createdAt'] != null
           ? (data['createdAt'] as Timestamp).toDate()
           : null,
+      assignedSantriIds: data['assignedSantriIds'] != null
+          ? List<String>.from(data['assignedSantriIds'])
+          : [],
     );
   }
 
@@ -49,6 +56,7 @@ class AppUserModel extends AppUser {
       'mobileNumber': mobileNumber,
       'role': role.toFirestoreString(),
       'createdAt': createdAt != null ? Timestamp.fromDate(createdAt!) : FieldValue.serverTimestamp(),
+      'assignedSantriIds': assignedSantriIds,
     };
   }
 
@@ -60,6 +68,7 @@ class AppUserModel extends AppUser {
       mobileNumber: user.mobileNumber,
       role: user.role,
       createdAt: user.createdAt,
+      assignedSantriIds: user.assignedSantriIds,
     );
   }
 }

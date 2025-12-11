@@ -16,13 +16,15 @@ class UserRepositoryImpl implements UserRepository {
     String uid,
     String email,
     String mobileNumber,
-    UserRole role,
-  ) {
+    UserRole role, {
+    List<String> assignedSantriIds = const [],
+  }) {
     return _firestore.collection('users').doc(uid).set({
       'uid': uid,
       'email': email,
       'mobileNumber': mobileNumber,
       'role': role.toFirestoreString(),
+      'assignedSantriIds': assignedSantriIds,
       'createdAt': FieldValue.serverTimestamp(),
     });
   }
@@ -41,5 +43,35 @@ class UserRepositoryImpl implements UserRepository {
         .doc(uid)
         .snapshots()
         .map((doc) => doc.exists ? AppUserModel.fromFirestore(doc) : null);
+  }
+
+  @override
+  Stream<List<AppUser>> getAllUsers() {
+    return _firestore
+        .collection('users')
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => AppUserModel.fromFirestore(doc))
+            .toList());
+  }
+
+  @override
+  Future<void> updateUserRole(String uid, UserRole newRole) {
+    return _firestore.collection('users').doc(uid).update({
+      'role': newRole.toFirestoreString(),
+    });
+  }
+
+  @override
+  Future<void> assignSantriToUser(String userUid, List<String> santriIds) {
+    return _firestore.collection('users').doc(userUid).update({
+      'assignedSantriIds': santriIds,
+    });
+  }
+
+  @override
+  Future<void> deleteUser(String uid) {
+    return _firestore.collection('users').doc(uid).delete();
   }
 }

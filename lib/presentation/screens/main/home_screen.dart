@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/user_providers.dart';
+import '../admin/user_management_screen.dart';
 import '../santri/santri_list_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -178,53 +179,80 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           const SizedBox(height: 16),
 
                           // Grid Menu
-                          GridView.count(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            crossAxisCount: 2, // 2 Kolom
-                            crossAxisSpacing: 16,
-                            mainAxisSpacing: 16,
-                            childAspectRatio: 1.1,
-                            children: [
-                              // 1. DATA SANTRI (Aktif)
-                              _buildMenuCard(
-                                title: "Data Santri",
-                                icon: Icons.people_alt_rounded,
-                                color: Colors.teal,
-                                onTap: () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const SantriListScreen(),
+                          // Ambil role untuk cek admin
+                          Builder(
+                            builder: (context) {
+                              final isAdmin = currentUserAsync.when(
+                                data: (appUser) => appUser?.role == UserRole.admin,
+                                loading: () => false,
+                                error: (_, __) => false,
+                              );
+                              
+                              return GridView.count(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                crossAxisCount: 2, // 2 Kolom
+                                crossAxisSpacing: 16,
+                                mainAxisSpacing: 16,
+                                childAspectRatio: 1.1,
+                                children: [
+                                  // 1. DATA SANTRI (Aktif)
+                                  _buildMenuCard(
+                                    title: "Data Santri",
+                                    icon: Icons.people_alt_rounded,
+                                    color: Colors.teal,
+                                    onTap: () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const SantriListScreen(),
+                                        ),
+                                      );
+                                    },
+                                  ),
+
+                                  // 2. AKADEMIK (Placeholder)
+                                  _buildMenuCard(
+                                    title: "Akademik",
+                                    icon: Icons.menu_book_rounded,
+                                    color: Colors.orange,
+                                    onTap: () => _showComingSoon(context),
+                                  ),
+
+                                  // 3. KEHADIRAN (Placeholder)
+                                  _buildMenuCard(
+                                    title: "Kehadiran",
+                                    icon: Icons.calendar_today_rounded,
+                                    color: Colors.blueAccent,
+                                    onTap: () => _showComingSoon(context),
+                                  ),
+
+                                  // 4. KEUANGAN (Placeholder)
+                                  _buildMenuCard(
+                                    title: "Keuangan",
+                                    icon: Icons.account_balance_wallet_rounded,
+                                    color: Colors.purpleAccent,
+                                    onTap: () => _showComingSoon(context),
+                                  ),
+                                  
+                                  // 5. KELOLA USER (Admin Only)
+                                  if (isAdmin)
+                                    _buildMenuCard(
+                                      title: "Kelola User",
+                                      icon: Icons.admin_panel_settings_rounded,
+                                      color: Colors.red,
+                                      onTap: () {
+                                        Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const UserManagementScreen(),
+                                          ),
+                                        );
+                                      },
                                     ),
-                                  );
-                                },
-                              ),
-
-                              // 2. AKADEMIK (Placeholder)
-                              _buildMenuCard(
-                                title: "Akademik",
-                                icon: Icons.menu_book_rounded,
-                                color: Colors.orange,
-                                onTap: () => _showComingSoon(context),
-                              ),
-
-                              // 3. KEHADIRAN (Placeholder)
-                              _buildMenuCard(
-                                title: "Kehadiran",
-                                icon: Icons.calendar_today_rounded,
-                                color: Colors.blueAccent,
-                                onTap: () => _showComingSoon(context),
-                              ),
-
-                              // 4. KEUANGAN (Placeholder)
-                              _buildMenuCard(
-                                title: "Keuangan",
-                                icon: Icons.account_balance_wallet_rounded,
-                                color: Colors.purpleAccent,
-                                onTap: () => _showComingSoon(context),
-                              ),
-                            ],
+                                ],
+                              );
+                            },
                           ),
 
                           const SizedBox(height: 24),
